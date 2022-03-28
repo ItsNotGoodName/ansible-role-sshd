@@ -1,10 +1,13 @@
 ---
-# This is an example playbook to execute Ansible tests.
-
 - name: Verify
   hosts: all
   gather_facts: false
   tasks:
-  - name: Example assertion
-    assert:
-      that: true
+    - name: Collect facts about system services
+      service_facts:
+      register: services_state
+    - name: Test if ssh is enabled and running
+      assert:
+        that:
+          - services_state.ansible_facts.services["ssh.service"]["state"] == "running"
+          - services_state.ansible_facts.services["ssh.service"]["status"] == "enabled"
