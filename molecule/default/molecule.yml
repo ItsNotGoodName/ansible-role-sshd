@@ -5,7 +5,14 @@ driver:
   name: podman
 platforms:
   - name: instance
-    image: quay.io/centos/centos:stream8
+    image: "docker.io/geerlingguy/docker-${MOLECULE_DISTRO:-debian11}-ansible:latest"
+    command: /sbin/init
+    privileged: true
+    tmpfs:
+      - /run
+      - /tmp
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
     pre_build_image: true
 provisioner:
   name: ansible

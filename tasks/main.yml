@@ -1,2 +1,36 @@
 ---
-# tasks file for sshd
+- name: Install ssh server
+  package:
+    name: "{{ sshd_package }}"
+    state: present
+  become: true
+  tags: sshd
+
+- name: Start ssh server
+  systemd:
+    name: "{{ sshd_service }}"
+    state: started
+  become: true
+  tags: sshd
+
+- name: Configure sshd config
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    validate: "sshd -T -f %s"
+    state: present
+  loop:
+    - regexp: "^PasswordAuthentication"
+      line: "PasswordAuthentication {{ sshd_password_authentication | ternary('yes', 'no') }}"
+    - regexp: "^PermitRootLogin"
+      line: "PermitRootLogin {{ sshd_permit_root_login | ternary('yes', 'no') }}"
+    - regexp: "^Port "
+      line: "Port {{ sshd_port }}"
+  become: true
+  notify: restart sshd
+  tags: sshd
+
+- name: flush handlers
+  meta: flush_handlers
+  tags: sshd

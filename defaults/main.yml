@@ -1,2 +1,7 @@
 ---
-# defaults file for sshd
+sshd_package: openssh-server
+sshd_service: ssh
+
+sshd_password_authentication: false
+sshd_permit_root_login: false
+sshd_port: 22
